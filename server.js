@@ -1,6 +1,7 @@
 require('dotenv').config({
-	path: '.env.local'
+	path: '.env.local',
 });
+
 const fs = require('fs');
 const path = require('path');
 const { ApolloServer } = require('apollo-server');
@@ -18,7 +19,7 @@ mongoose
 		process.env.MONGO_URI,
 		{
 			useNewUrlParser: true,
-			useCreateIndex: true
+			useCreateIndex: true,
 		}
 	)
 	.then(() => console.log('Connected to MongoDB'))
@@ -29,8 +30,8 @@ const server = new ApolloServer({
 	resolvers,
 	context: {
 		User,
-		Post
-	}
+		Post,
+	},
 });
 
 // By default we will listen on port 4000
