@@ -1,8 +1,13 @@
 require('dotenv').config({
 	path: '.env.local'
 });
-const { ApolloServer, gql } = require('apollo-server');
+const fs = require('fs');
+const path = require('path');
+const { ApolloServer } = require('apollo-server');
 const mongoose = require('mongoose');
+
+const filePath = path.join(__dirname, 'typeDefs.gql');
+const typeDefs = fs.readFileSync(filePath, 'utf-8');
 
 const User = require('./models/User');
 const Post = require('./models/Post');
@@ -16,16 +21,6 @@ mongoose
 	)
 	.then(() => console.log('Connected to MongoDB'))
 	.catch(err => console.error('Connection to MongoDB failed:', err));
-
-const typeDefs = gql`
-	type Todo {
-		task: String
-		completed: Boolean
-	}
-	type Query {
-		getTodos: [Todo]
-	}
-`;
 
 const server = new ApolloServer({
 	typeDefs,
