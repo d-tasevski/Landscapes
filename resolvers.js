@@ -3,6 +3,13 @@ module.exports = {
 		getUser() {
 			return null;
 		},
+		async getPosts(root, args, { Post }) {
+			const posts = await Post.find({})
+				.sort({ createdDate: 'desc' })
+				// populate createdBy field with author data
+				.populate({ path: 'createdBy', model: 'User' });
+			return posts;
+		},
 	},
 	Mutation: {
 		async addPost(root, { title, imageUrl, categories, description, creatorId }, { Post }) {
