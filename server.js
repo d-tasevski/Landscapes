@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 const filePath = path.join(__dirname, 'typeDefs.gql');
 const typeDefs = fs.readFileSync(filePath, 'utf-8');
+const resolvers = require('./resolvers');
 
 const User = require('./models/User');
 const Post = require('./models/Post');
@@ -16,7 +17,8 @@ mongoose
 	.connect(
 		process.env.MONGO_URI,
 		{
-			useNewUrlParser: true
+			useNewUrlParser: true,
+			useCreateIndex: true
 		}
 	)
 	.then(() => console.log('Connected to MongoDB'))
@@ -24,6 +26,7 @@ mongoose
 
 const server = new ApolloServer({
 	typeDefs,
+	resolvers,
 	context: {
 		User,
 		Post
