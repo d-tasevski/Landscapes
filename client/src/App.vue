@@ -1,8 +1,27 @@
 <template>
-	<v-app>
+	<v-app style="background: #e3e3ee">
+		<!-- Sidebar -->
+		<v-navigation-drawer app temporary fixed v-model="sideNav">
+			<v-toolbar color="accent" dark flat>
+				<v-toolbar-side-icon @click="toggleSidebar" />
+				<router-link to="/" tag="span" style="cursor: pointer">
+					<h1 class="title pl-3">Landscape</h1>
+				</router-link>
+			</v-toolbar>
+			<v-divider />
+			<!-- Side navbar links -->
+			<v-list>
+				<v-list-tile ripple v-for="item in sideNavItems" :key="item.title" :to="item.link">
+					<v-list-tile-action>
+						<v-icon>{{ item.icon }}</v-icon>
+					</v-list-tile-action>
+					<v-list-tile-content> {{ item.title }} </v-list-tile-content>
+				</v-list-tile>
+			</v-list>
+		</v-navigation-drawer>
 		<!-- Horizontal Navbar -->
 		<v-toolbar fixed color="primary" dark>
-			<v-toolbar-side-icon></v-toolbar-side-icon>
+			<v-toolbar-side-icon @click="toggleSidebar" />
 			<v-toolbar-title class="hidden-xs-only">
 				<router-link to="/" tag="span" style="cursor: pointer">Landscape</router-link>
 			</v-toolbar-title>
@@ -35,8 +54,25 @@
 <script>
 export default {
 	name: 'App',
+	data() {
+		return {
+			sideNav: false,
+		};
+	},
+	methods: {
+		toggleSidebar() {
+			this.sideNav = !this.sideNav;
+		},
+	},
 	computed: {
 		horizontalNavItems() {
+			return [
+				{ icon: 'chat', title: 'Posts', link: '/posts' },
+				{ icon: 'lock_open', title: 'Sign In', link: '/signin' },
+				{ icon: 'create', title: 'Sign Up', link: '/signup' },
+			];
+		},
+		sideNavItems() {
 			return [
 				{ icon: 'chat', title: 'Posts', link: '/posts' },
 				{ icon: 'lock_open', title: 'Sign In', link: '/signin' },
