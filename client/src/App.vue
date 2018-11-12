@@ -46,7 +46,9 @@
 		</v-toolbar>
 		<!-- App Content -->
 		<main>
-			<v-container class="mt-4"> <router-view /> </v-container>
+			<v-container class="mt-4">
+				<transition name="fade"> <router-view /> </transition>
+			</v-container>
 		</main>
 	</v-app>
 </template>
@@ -83,4 +85,20 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+	transition-property: all;
+	transition-duration: 0.25s;
+}
+
+.fade-enter-active {
+	transition-delay: 0.25s;
+}
+
+.fade-enter,
+.fade-leave-active {
+	opacity: 0;
+	transform: translateX(-25px);
+}
+</style>
