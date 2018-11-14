@@ -18,7 +18,7 @@ const apolloProvider = new VueApollo({ defaultClient });
 
 new Vue({
 	// Inject apollo to all components so that we can perform queries and mutations
-	provider: apolloProvider.provide(),
+	apolloProvider,
 	router,
 	store,
 	render: h => h(App),
