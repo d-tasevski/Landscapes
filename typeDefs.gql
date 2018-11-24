@@ -32,7 +32,7 @@ type Token {
 }
 
 type Query {
-	getUser: User
+	getCurrentUser: User
 	getPosts: [Post]
 }
 

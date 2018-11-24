@@ -12,6 +12,22 @@ export const GET_POSTS = gql`
 `;
 
 /* User Queries */
+export const GET_CURRENT_USER = gql`
+	query {
+		getCurrentUser {
+			_id
+			email
+			avatar
+			username
+			joinDate
+			favorites {
+				_id
+				title
+				imageUrl
+			}
+		}
+	}
+`;
 
 /* Posts Mutations */
 

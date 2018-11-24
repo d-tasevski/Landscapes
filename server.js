@@ -19,8 +19,7 @@ const Post = require('./models/Post');
 const getUser = async token => {
 	if (token) {
 		try {
-			const user = await jwt.verify(token, process.env.JWT_SECRET);
-			console.log(user);
+			return await jwt.verify(token, process.env.JWT_SECRET);
 		} catch (err) {
 			throw new AuthenticationError('Your sesion has expired. Please sign in again.');
 		}

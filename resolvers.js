@@ -6,8 +6,15 @@ const createToken = ({ username, email }, secret, expiresIn) =>
 
 module.exports = {
 	Query: {
-		getUser() {
-			return null;
+		async getCurrentUser(root, args, { User, currentUser }) {
+			if (!currentUser) return null;
+
+			const user = await User.findOne({ username: currentUser.username }).populate({
+				path: 'favorites',
+				model: 'Post',
+			});
+
+			return user;
 		},
 		async getPosts(root, args, { Post }) {
 			const posts = await Post.find({})
