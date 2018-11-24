@@ -1,3 +1,9 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const createToken = ({ username, email }, secret, expiresIn) =>
+	jwt.sign({ username, email }, secret, { expiresIn });
+
 module.exports = {
 	Query: {
 		getUser() {
@@ -22,20 +28,26 @@ module.exports = {
 			}).save();
 			return newPost;
 		},
+		async signinUser(root, { username, password }, { User }) {
+			const user = await User.findOne({ username });
+			if (!user) throw new Error('User not found!');
+
+			const isValidPass = await bcrypt.compare(password, user.password);
+			if (!isValidPass) throw new Error('Invalid credentials');
+
+			return { token: createToken(user, process.env.JWT_SECRET, '1hr') };
+		},
 		async signupUser(root, { username, email, password }, { User }) {
-			const user = await User.findOne({
-				username,
-			});
-			if (user) {
-				// There is already user with that username, abort
-				throw new Error('User with that username already exists');
-			}
+			const user = await User.findOne({ username });
+			if (user) throw new Error('User with that username already exists');
+
 			const newUser = await new User({
 				username,
 				email,
 				password,
 			}).save();
-			return newUser;
+
+			return { token: createToken(newUser, process.env.JWT_SECRET, '1hr') };
 		},
 	},
 };
