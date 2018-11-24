@@ -4,8 +4,9 @@ require('dotenv').config({
 
 const fs = require('fs');
 const path = require('path');
-const { ApolloServer } = require('apollo-server');
+const { ApolloServer, AuthenticationError } = require('apollo-server');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 const filePath = path.join(__dirname, 'typeDefs.gql');
 const typeDefs = fs.readFileSync(filePath, 'utf-8');
@@ -13,6 +14,18 @@ const resolvers = require('./resolvers');
 
 const User = require('./models/User');
 const Post = require('./models/Post');
+
+// Verify JWT token passed from client
+const getUser = async token => {
+	if (token) {
+		try {
+			const user = await jwt.verify(token, process.env.JWT_SECRET);
+			console.log(user);
+		} catch (err) {
+			throw new AuthenticationError('Your sesion has expired. Please sign in again.');
+		}
+	}
+};
 
 mongoose
 	.connect(
@@ -28,9 +41,13 @@ mongoose
 const server = new ApolloServer({
 	typeDefs,
 	resolvers,
-	context: {
-		User,
-		Post,
+	context: async ({ req }) => {
+		const token = req.headers.authorization;
+		return {
+			User,
+			Post,
+			currentUser: await getUser(token),
+		};
 	},
 });
 
