@@ -28,6 +28,9 @@ export default new Vuex.Store({
 		clearUser(state) {
 			state.user = null;
 		},
+		setToken(state, payload) {
+			localStorage.setItem('token', payload);
+		},
 	},
 	actions: {
 		async getCurrentUser({ commit }) {
@@ -59,13 +62,15 @@ export default new Vuex.Store({
 				});
 		},
 		async signinUser({ commit }, payload) {
+			// Clear token to prevent errors (if token is malformed for example)
+			commit('setToken', '');
 			return await apolloClient
 				.mutate({
 					mutation: SIGNIN_USER,
 					variables: payload,
 				})
 				.then(({ data }) => {
-					localStorage.setItem('token', data.signinUser.token);
+					commit('setToken', data.signinUser.token);
 					// To make sure that the created method in main.js is run reload the page :/
 					router.go();
 				})
@@ -77,7 +82,7 @@ export default new Vuex.Store({
 			// clear user in state
 			commit('clearUser');
 			// remove token from local storage
-			localStorage.setItem('token', '');
+			commit('setToken', '');
 			// end the session
 			await apolloClient.resetStore();
 			// redirect to home page (to kick users out of private pages)
