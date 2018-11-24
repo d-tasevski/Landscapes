@@ -4,6 +4,8 @@ import { gql } from 'apollo-boost';
 
 import { defaultClient as apolloClient } from './main';
 
+import { GET_POSTS } from './queries';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -25,17 +27,7 @@ export default new Vuex.Store({
 				commit('setLoading', true);
 				// Use Apolloclient to fire getPosts query
 				const { data } = await apolloClient.query({
-					query: gql`
-						query {
-							getPosts {
-								_id
-								title
-								imageUrl
-								description
-								likes
-							}
-						}
-					`,
+					query: GET_POSTS,
 				});
 				// Commit will pass data from action to mutation func
 				commit('setPosts', data.getPosts);
