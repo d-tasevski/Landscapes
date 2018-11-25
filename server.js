@@ -40,6 +40,10 @@ mongoose
 const server = new ApolloServer({
 	typeDefs,
 	resolvers,
+	formatError: err => ({
+		name: err.name,
+		message: err.message.replace('Context creation failed:', ''),
+	}),
 	context: async ({ req }) => {
 		const token = req.headers.authorization;
 		return {

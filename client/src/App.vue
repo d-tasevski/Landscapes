@@ -1,15 +1,17 @@
 <template>
-	<v-app style="background: #e3e3ee">
-		<!-- Sidebar -->
+	<v-app style="background: #E3E3EE">
+		<!-- Side Navbar -->
 		<v-navigation-drawer app temporary fixed v-model="sideNav">
 			<v-toolbar color="accent" dark flat>
-				<v-toolbar-side-icon @click="toggleSidebar" />
+				<v-toolbar-side-icon @click="toggleSideNav"></v-toolbar-side-icon>
 				<router-link to="/" tag="span" style="cursor: pointer">
-					<h1 class="title pl-3">Landscape</h1>
+					<h1 class="title pl-3">VueShare</h1>
 				</router-link>
 			</v-toolbar>
-			<v-divider />
-			<!-- Side navbar links -->
+
+			<v-divider></v-divider>
+
+			<!-- Side Navbar Links -->
 			<v-list>
 				<v-list-tile ripple v-for="item in sideNavItems" :key="item.title" :to="item.link">
 					<v-list-tile-action>
@@ -17,6 +19,7 @@
 					</v-list-tile-action>
 					<v-list-tile-content> {{ item.title }} </v-list-tile-content>
 				</v-list-tile>
+
 				<!-- Signout Button -->
 				<v-list-tile v-if="user" @click="handleSignoutUser">
 					<v-list-tile-action> <v-icon>exit_to_app</v-icon> </v-list-tile-action>
@@ -24,29 +27,36 @@
 				</v-list-tile>
 			</v-list>
 		</v-navigation-drawer>
+
 		<!-- Horizontal Navbar -->
 		<v-toolbar fixed color="primary" dark>
-			<v-toolbar-side-icon @click="toggleSidebar" />
+			<!-- App Title -->
+			<v-toolbar-side-icon @click="toggleSideNav"></v-toolbar-side-icon>
 			<v-toolbar-title class="hidden-xs-only">
-				<router-link to="/" tag="span" style="cursor: pointer">Landscape</router-link>
+				<router-link to="/" tag="span" style="cursor: pointer"> VueShare </router-link>
 			</v-toolbar-title>
-			<v-spacer />
-			<!-- Search input -->
+
+			<v-spacer></v-spacer>
+
+			<!-- Search Input -->
 			<v-text-field
 				flex
 				prepend-icon="search"
 				placeholder="Search posts"
-				aria-placeholder="Search posts"
 				color="accent"
 				single-line
 				hide-details
-			/>
-			<v-spacer />
-			<!-- Horizontal navbar links -->
+			></v-text-field>
+
+			<v-spacer></v-spacer>
+
+			<!-- Horizontal Navbar Links -->
 			<v-toolbar-items class="hidden-xs-only">
 				<v-btn flat v-for="item in horizontalNavItems" :key="item.title" :to="item.link">
-					<v-icon class="hidden-sm-only" left>{{ item.icon }}</v-icon> {{ item.title }}
+					<v-icon class="hidden-sm-only" left>{{ item.icon }}</v-icon>
+					{{ item.title }}
 				</v-btn>
+
 				<!-- Profile Button -->
 				<v-btn flat to="/profile" v-if="user">
 					<v-icon class="hidden-sm-only" left>account_box</v-icon>
@@ -55,6 +65,7 @@
 						Profile
 					</v-badge>
 				</v-btn>
+
 				<!-- Signout Button -->
 				<v-btn flat v-if="user" @click="handleSignoutUser">
 					<v-icon class="hidden-sm-only" left>exit_to_app</v-icon>
@@ -62,10 +73,32 @@
 				</v-btn>
 			</v-toolbar-items>
 		</v-toolbar>
+
 		<!-- App Content -->
 		<main>
 			<v-container class="mt-4">
 				<transition name="fade"> <router-view /> </transition>
+
+				<!-- Auth Snackbar -->
+				<v-snackbar v-model="authSnackbar" color="success" :timeout="5000" bottom left>
+					<v-icon class="mr-3">check_circle</v-icon>
+					<h3>You are now signed in!</h3>
+					<v-btn dark flat @click="authSnackbar = false;">Close</v-btn>
+				</v-snackbar>
+
+				<!-- Auth Error Snackbar -->
+				<v-snackbar
+					v-if="authError"
+					v-model="authErrorSnackbar"
+					color="info"
+					:timeout="5000"
+					bottom
+					left
+				>
+					<v-icon class="mr-3">cancel</v-icon>
+					<h3>{{ authError.message }}</h3>
+					<v-btn dark flat to="/signin">Sign in</v-btn>
+				</v-snackbar>
 			</v-container>
 		</main>
 	</v-app>
@@ -79,18 +112,26 @@ export default {
 	data() {
 		return {
 			sideNav: false,
+			authSnackbar: false,
+			authErrorSnackbar: false,
 		};
 	},
-	methods: {
-		toggleSidebar() {
-			this.sideNav = !this.sideNav;
+	watch: {
+		user(newValue, oldValue) {
+			// if we had no value for user before, show snackbar
+			if (oldValue === null) {
+				this.authSnackbar = true;
+			}
 		},
-		handleSignoutUser() {
-			this.$store.dispatch('signoutUser');
+		authError(value) {
+			// if auth error is not null, show auth error snackbar
+			if (value !== null) {
+				this.authErrorSnackbar = true;
+			}
 		},
 	},
 	computed: {
-		...mapGetters(['user']),
+		...mapGetters(['authError', 'user']),
 		horizontalNavItems() {
 			let items = [
 				{ icon: 'chat', title: 'Posts', link: '/posts' },
@@ -118,13 +159,21 @@ export default {
 			return items;
 		},
 	},
+	methods: {
+		handleSignoutUser() {
+			this.$store.dispatch('signoutUser');
+		},
+		toggleSideNav() {
+			this.sideNav = !this.sideNav;
+		},
+	},
 };
 </script>
 
 <style>
 .fade-enter-active,
 .fade-leave-active {
-	transition-property: all;
+	transition-property: opacity;
 	transition-duration: 0.25s;
 }
 
@@ -135,6 +184,5 @@ export default {
 .fade-enter,
 .fade-leave-active {
 	opacity: 0;
-	transform: translateX(-25px);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
 	<v-container text-xs-center>
 		<v-layout row>
-			<v-dialog v-model="isLoading" persistent fullscreen>
+			<v-dialog v-model="loading" persistent fullscreen>
 				<v-container fill-height>
 					<v-layout row justify-center align-center>
 						<v-progress-circular
@@ -16,7 +16,7 @@
 		</v-layout>
 		<v-flex xs12>
 			<v-carousel
-				v-if="!isLoading && posts.length > 0"
+				v-if="!loading && posts.length > 0"
 				v-bind="{ cycle: true }"
 				interval="3000"
 			>
@@ -44,7 +44,7 @@ export default {
 	},
 	computed: {
 		// Spread needed getters from vuex store
-		...mapGetters(['isLoading', 'posts']),
+		...mapGetters(['loading', 'posts']),
 	},
 };
 </script>

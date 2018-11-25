@@ -9,6 +9,12 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
+import FormAlert from './components/Shared/FormAlert';
+
+// Global components
+Vue.component('form-alert', FormAlert);
+
+// Vue Graphql setup
 Vue.use(VueApollo);
 
 export const defaultClient = new ApolloClient({
@@ -30,6 +36,12 @@ export const defaultClient = new ApolloClient({
 		if (graphQLErrors) {
 			for (const err of graphQLErrors) {
 				console.dir('[graphQL Error]', err);
+				if (err.name === 'AuthenticationError') {
+					// set auth auth error in state (to show the snackbar)
+					store.commit('setAuthError', err);
+					// signout user (to clear the token)
+					store.dispatch('signoutUser');
+				}
 			}
 		}
 	},
