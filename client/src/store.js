@@ -70,7 +70,32 @@ export default new Vuex.Store({
 		},
 		addPost({ commit }, payload) {
 			return apolloClient
-				.mutate({ mutation: ADD_POST, variables: payload })
+				.mutate({
+					mutation: ADD_POST,
+					variables: payload,
+					update(
+						cache,
+						{
+							data: { addPost },
+						}
+					) {
+						// Read the query you want to update
+						const data = cache.readQuery({ query: GET_POSTS });
+						// Create updated data
+						data.getPosts.unshift(addPost);
+						// Write updated data back to the query
+						cache.writeQuery({ query: GET_POSTS, data });
+					},
+					// optimistic response ensures that the data is added immediately as we specified for the update func
+					optimisticResponse: {
+						__typename: 'Mutation',
+						addPost: {
+							__typename: 'Post',
+							_id: -1, // add it to beginning of the array and ensure there is no id conflicts
+							...payload,
+						},
+					},
+				})
 				.then(({ data }) => {})
 				.catch(err => {
 					throw new Error(err);

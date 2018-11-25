@@ -50,8 +50,6 @@ export const ADD_POST = gql`
 			imageUrl
 			categories
 			description
-			createdDate
-			likes
 		}
 	}
 `;
