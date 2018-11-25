@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const md5 = require('md5');
 const bcrypt = require('bcrypt');
+const gravatar = require('gravatar');
 
 const UserSchema = new mongoose.Schema({
 	username: {
@@ -19,6 +20,7 @@ const UserSchema = new mongoose.Schema({
 	password: {
 		type: String,
 		required: true,
+		trim: true,
 	},
 	avatar: {
 		type: String,
@@ -36,7 +38,7 @@ const UserSchema = new mongoose.Schema({
 
 // Create and add avatar to user
 UserSchema.pre('save', function(next) {
-	this.avatar = `http://gravatar.com/avatar/${md5(this.username)}?d=indenticon`;
+	this.avatar = gravatar.url(this.email, { s: '100', r: 'x', d: 'retro' }, true);
 	return next();
 });
 // Hash password
