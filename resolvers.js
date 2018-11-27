@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const { handleError } = require('./helpers');
+
 const createToken = ({ username, email }, secret, expiresIn) =>
 	jwt.sign({ username, email }, secret, { expiresIn });
 
@@ -9,10 +11,12 @@ module.exports = {
 		async getCurrentUser(root, args, { User, currentUser }) {
 			if (!currentUser) return null;
 
-			const user = await User.findOne({ username: currentUser.username }).populate({
-				path: 'favorites',
-				model: 'Post',
-			});
+			const user = await User.findOne({ username: currentUser.username })
+				.populate({
+					path: 'favorites',
+					model: 'Post',
+				})
+				.catch(err => handleError(err));
 
 			return user;
 		},
@@ -20,8 +24,20 @@ module.exports = {
 			const posts = await Post.find({})
 				.sort({ createdDate: 'desc' })
 				// populate createdBy field with author data
-				.populate({ path: 'createdBy', model: 'User' });
+				.populate({ path: 'createdBy', model: 'User' })
+				.catch(err => handleError(err));
+
 			return posts;
+		},
+		async getPost(root, { postId }, { Post }) {
+			const post = await Post.findById(postId)
+				.populate({
+					path: 'messages.messageUser',
+					model: 'User',
+				})
+				.catch(err => handleError(err));
+
+			return post;
 		},
 		async infiniteScrollPosts(root, { pageNum, pageSize }, { Post }) {
 			let posts;
@@ -41,6 +57,7 @@ module.exports = {
 			}
 			const totalDocs = await Post.countDocuments();
 			const hasMore = totalDocs > pageSize * pageNum;
+
 			return { posts, hasMore };
 		},
 	},
@@ -52,7 +69,10 @@ module.exports = {
 				categories,
 				description,
 				createdBy: creatorId,
-			}).save();
+			})
+				.save()
+				.catch(err => handleError(err));
+
 			return newPost;
 		},
 		async signinUser(root, { username, password }, { User }) {
@@ -72,7 +92,9 @@ module.exports = {
 				username,
 				email,
 				password,
-			}).save();
+			})
+				.save()
+				.catch(err => handleError(err));
 
 			return { token: createToken(newUser, process.env.JWT_SECRET, '1hr') };
 		},

@@ -12,4 +12,8 @@ function to(promise, errorExt) {
 		});
 }
 
-module.exports = { to };
+function handleError(err) {
+	throw new Error(err);
+}
+
+module.exports = { to, handleError };

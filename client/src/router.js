@@ -9,6 +9,7 @@ import Signup from './components/Auth/Signup';
 import Profile from './components/Auth/Profile';
 import AddPost from './components/Posts/AddPost';
 import Posts from './components/Posts/Posts';
+import Post from './components/Posts/Post';
 
 Vue.use(Router);
 
@@ -25,6 +26,12 @@ export default new Router({
 			path: '/posts',
 			name: 'Posts',
 			component: Posts,
+		},
+		{
+			path: '/posts/:postId',
+			name: 'Post',
+			component: Post,
+			props: true,
 		},
 		{
 			path: '/post/add',
