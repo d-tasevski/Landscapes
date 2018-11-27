@@ -48,17 +48,25 @@
 			<!-- Message Input -->
 			<v-layout class="mb-3" v-if="user">
 				<v-flex xs12>
-					<v-form>
+					<v-form
+						v-model="isFormValid"
+						lazy-validation
+						ref="form"
+						@submit.prevent="handleAddPostMessage"
+					>
 						<v-layout row>
 							<v-flex xs12>
 								<v-text-field
+									v-model="messageBody"
 									clearable
-									append-outer-icon="send"
+									:rules="messageRules"
+									:append-outer-icon="messageBody && 'send'"
 									label="Add Message"
 									type="text"
 									prepend-icon="email"
 									required
-								></v-text-field>
+									@click:append-outer="handleAddPostMessage"
+								/>
 							</v-flex>
 						</v-layout>
 					</v-form>
@@ -72,7 +80,7 @@
 						<v-subheader>Messages ({{ getPost.messages.length }})</v-subheader>
 
 						<template v-for="message in getPost.messages">
-							<v-divider :key="message._id"></v-divider>
+							<v-divider :key="message._id" />
 
 							<v-list-tile avatar inset :key="message.title">
 								<v-list-tile-avatar>
@@ -92,7 +100,9 @@
 								</v-list-tile-content>
 
 								<v-list-tile-action class="hidden-xs-only">
-									<v-icon color="grey">chat_bubble</v-icon>
+									<v-icon :color="checkIfOwnMessage(message) ? 'accent' : 'gray'">
+										chat_bubble
+									</v-icon>
 								</v-list-tile-action>
 							</v-list-tile>
 						</template>
@@ -105,7 +115,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { GET_POST } from '../../queries.js';
+import { GET_POST, ADD_POST_MESSAGE } from '../../queries.js';
 
 export default {
 	name: 'Post',
@@ -113,6 +123,14 @@ export default {
 	data() {
 		return {
 			dialog: false,
+			messageBody: '',
+			isFormValid: true,
+			messageRules: [
+				message => !!message || 'Message is required',
+				message =>
+					(!!message && message.length < 50) ||
+					'Message length must be less than 50 characters',
+			],
 		};
 	},
 	apollo: {
@@ -134,6 +152,38 @@ export default {
 			if (window.innerWidth > 500) {
 				this.dialog = !this.dialog;
 			}
+		},
+		handleAddPostMessage() {
+			if (!this.$refs.form.validate()) return;
+
+			return this.$apollo
+				.mutate({
+					mutation: ADD_POST_MESSAGE,
+					variables: {
+						messageBody: this.messageBody,
+						userId: this.user._id,
+						postId: this.postId,
+					},
+					update: (cache, { data: { addPostMessage } }) => {
+						const data = cache.readQuery({
+							query: GET_POST,
+							variables: { postId: this.postId },
+						});
+						data.getPost.messages.unshift(addPostMessage);
+						cache.writeQuery({
+							query: GET_POST,
+							variables: { postId: this.postId },
+							data,
+						});
+					},
+				})
+				.then(() => {
+					this.$refs.form.reset();
+				})
+				.catch(err => console.error(err));
+		},
+		checkIfOwnMessage(msg) {
+			return this.user && this.user._id === msg.messageUser._id;
 		},
 	},
 };
