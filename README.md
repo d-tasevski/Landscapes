@@ -1,2 +1,2 @@
 # Landscapes
-Vue | GraphQL image sharing application - WIP
+Vue, Vuetify & Vuex | GraphQL image sharing application - WIP
