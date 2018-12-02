@@ -94,7 +94,7 @@ module.exports = {
 			// Find post, increment it's "like" value
 			const post = await Post.findOneAndUpdate(
 				{ _id: postId },
-				{ $inc: { Likes: 1 } },
+				{ $inc: { likes: 1 } },
 				{ new: true }
 			);
 			// Find user and id of the post to their favorites
@@ -111,7 +111,7 @@ module.exports = {
 			// Find post, increment it's "like" value
 			const post = await Post.findOneAndUpdate(
 				{ _id: postId },
-				{ $inc: { Likes: -1 } },
+				{ $inc: { likes: -1 } },
 				{ new: true }
 			);
 			// Find user and id of the post to their favorites

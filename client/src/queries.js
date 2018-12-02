@@ -18,6 +18,7 @@ export const GET_POST = gql`
 			title
 			imageUrl
 			categories
+			likes
 			createdBy {
 				_id
 			}
