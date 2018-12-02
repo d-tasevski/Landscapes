@@ -90,6 +90,40 @@ module.exports = {
 
 			return post.messages[0];
 		},
+		async likePost(root, { postId, username }, { Post, User }) {
+			// Find post, increment it's "like" value
+			const post = await Post.findOneAndUpdate(
+				{ _id: postId },
+				{ $inc: { Likes: 1 } },
+				{ new: true }
+			);
+			// Find user and id of the post to their favorites
+			const user = await User.findOneAndUpdate(
+				{ username },
+				{ $addToSet: { favorites: postId } },
+				{ new: true }
+			).populate({ path: 'favorites', model: 'Post' });
+
+			// Return only likes from "post" and favorites from the "user"
+			return { likes: post.likes, favorites: user.favorites };
+		},
+		async unlikePost(root, { postId, username }, { Post, User }) {
+			// Find post, increment it's "like" value
+			const post = await Post.findOneAndUpdate(
+				{ _id: postId },
+				{ $inc: { Likes: -1 } },
+				{ new: true }
+			);
+			// Find user and id of the post to their favorites
+			const user = await User.findOneAndUpdate(
+				{ username },
+				{ $pull: { favorites: postId } },
+				{ new: true }
+			).populate({ path: 'favorites', model: 'Post' });
+
+			// Return only likes from "post" and favorites from the "user"
+			return { likes: post.likes, favorites: user.favorites };
+		},
 		async signinUser(root, { username, password }, { User }) {
 			const user = await User.findOne({ username });
 			if (!user) throw new Error('User not found!');
