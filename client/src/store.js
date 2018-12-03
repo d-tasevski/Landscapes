@@ -5,7 +5,14 @@ import Vuex from 'vuex';
 import { defaultClient as apolloClient } from './main';
 import router from './router';
 
-import { GET_POSTS, SIGNIN_USER, SIGNUP_USER, GET_CURRENT_USER, ADD_POST } from './queries';
+import {
+	GET_POSTS,
+	SIGNIN_USER,
+	SIGNUP_USER,
+	GET_CURRENT_USER,
+	ADD_POST,
+	SEARCH_POSTS,
+} from './queries';
 
 Vue.use(Vuex);
 
@@ -16,6 +23,7 @@ export default new Vuex.Store({
 		user: null,
 		error: null,
 		authError: null,
+		searchResults: [],
 	},
 	mutations: {
 		setPosts(state, payload) {
@@ -36,6 +44,12 @@ export default new Vuex.Store({
 		setAuthError(state, payload) {
 			state.authError = payload;
 		},
+		setSearchResults(state, payload) {
+			if (payload !== null) {
+				state.searchResults = payload;
+			}
+		},
+		clearSearchResults: state => (state.searchResults = []),
 		clearUser: state => (state.user = null),
 		clearError: state => (state.error = null),
 	},
@@ -101,6 +115,20 @@ export default new Vuex.Store({
 					throw new Error(err);
 				});
 		},
+		searchPosts: ({ commit }, payload) => {
+			apolloClient
+				.query({
+					query: SEARCH_POSTS,
+					variables: payload,
+				})
+				.then(({ data }) => {
+					commit('setSearchResults', data.searchPosts);
+				})
+				.catch(err => {
+					commit('setError', err);
+					console.error(err);
+				});
+		},
 		signupUser: ({ commit }, payload) => {
 			commit('clearError');
 			commit('setLoading', true);
@@ -162,5 +190,6 @@ export default new Vuex.Store({
 		error: state => state.error,
 		authError: state => state.authError,
 		userFavorites: state => state.user && state.user.favorites,
+		searchResults: state => state.searchResults,
 	},
 });
