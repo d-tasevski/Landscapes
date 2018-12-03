@@ -39,6 +39,21 @@ module.exports = {
 
 			return post;
 		},
+		async searchPosts(root, { searchTerm }, { Post }) {
+			if (searchTerm) {
+				const searchResults = await Post.find(
+					// Perform text search
+					{ $text: { $search: searchTerm } },
+					// Assign 'searchTerm' a text score to provide best match
+					{ score: { $meta: 'textScore' } }
+				)
+					// Sort results according to that textScore (as well as by likes in desc order)
+					.sort({ score: { $meta: 'textScore' }, likes: 'desc' })
+					.limit(5);
+
+				return searchResults;
+			}
+		},
 		async infiniteScrollPosts(root, { pageNum, pageSize }, { Post }) {
 			let posts;
 			if (pageNum === 1) {
