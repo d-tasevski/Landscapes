@@ -41,7 +41,7 @@
 										{{ post.createdBy.username }}
 									</v-list-tile-title>
 									<v-list-tile-sub-title class="font-weight-thin">
-										Added {{ post.createdDate }}
+										Added {{ formatDate(post.createdDate) }}
 									</v-list-tile-sub-title>
 								</v-list-tile-content>
 
@@ -70,9 +70,10 @@
 
 <script>
 /* eslint-disable no-console */
+import format from 'date-fns/format';
 import { INFINITE_SCROLL_POSTS } from '../../queries';
 
-const pageSize = 2;
+const pageSize = 4;
 
 export default {
 	name: 'Posts',
@@ -123,6 +124,9 @@ export default {
 		},
 		goToPost(postId) {
 			this.$router.push(`/posts/${postId}`);
+		},
+		formatDate(date) {
+			return format(date, 'Do MMMM YYYY');
 		},
 	},
 };

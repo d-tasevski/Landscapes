@@ -59,6 +59,7 @@ export default {
 
 <style>
 #carousel__title {
+	cursor: pointer;
 	position: absolute;
 	background-color: rgba(0, 0, 0, 0.5);
 	color: white;

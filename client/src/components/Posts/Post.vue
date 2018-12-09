@@ -90,15 +90,15 @@
 								</v-list-tile-avatar>
 
 								<v-list-tile-content>
+									<v-list-tile-sub-title>
+										{{ message.messageUser.username }}
+										<span class="grey--text text--lighten-1 hidden-xs-only">
+											{{ formatDate(message.messageDate) }}
+										</span>
+									</v-list-tile-sub-title>
 									<v-list-tile-title>
 										{{ message.messageBody }}
 									</v-list-tile-title>
-									<v-list-tile-sub-title>
-										{{ message.messageUser.username }}
-										<span class="grey--text text--lighten-1 hidden-xs-only">{{
-											message.messageDate
-										}}</span>
-									</v-list-tile-sub-title>
 								</v-list-tile-content>
 
 								<v-list-tile-action class="hidden-xs-only">
@@ -117,6 +117,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 import { GET_POST, ADD_POST_MESSAGE, LIKE_POST, UNLIKE_POST } from '../../queries.js';
 
 export default {
@@ -257,6 +258,9 @@ export default {
 		},
 		checkIfOwnMessage(msg) {
 			return this.user && this.user._id === msg.messageUser._id;
+		},
+		formatDate(date) {
+			return `${distanceInWordsToNow(date)} ago`;
 		},
 	},
 };

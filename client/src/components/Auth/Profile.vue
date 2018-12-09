@@ -9,7 +9,7 @@
 						<v-card-title primary-title>
 							<div>
 								<div class="headline">{{ user.username }}</div>
-								<div>Joined {{ user.joinDate }}</div>
+								<div>Joined {{ formatDate(user.joinDate) }}</div>
 								<div class="hidden-xs-only font-weight-thin">
 									{{ user.favorites.length }} Favorites
 								</div>
@@ -183,6 +183,7 @@
 </template>
 
 <script>
+import format from 'date-fns/format';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -250,6 +251,9 @@ export default {
 			this.imageUrl = imageUrl;
 			this.categories = categories;
 			this.description = description;
+		},
+		formatDate(date) {
+			return format(date, 'Do MMMM YYYY');
 		},
 	},
 };
