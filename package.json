@@ -28,6 +28,9 @@
 		"nodemon": "^1.18.1",
 		"prettier": "^1.15.2"
 	},
+	"resolutions": {
+		"**/event-stream": "^4.0.1"
+	},
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",

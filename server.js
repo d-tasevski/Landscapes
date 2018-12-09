@@ -24,6 +24,8 @@ const getUser = async token => {
 			throw new AuthenticationError('Your sesion has expired. Please sign in again.');
 		}
 	}
+
+	return null;
 };
 
 mongoose
@@ -55,4 +57,6 @@ const server = new ApolloServer({
 });
 
 // By default we will listen on port 4000
-server.listen().then(({ url }) => console.info(`Server up and running on port ${url}`));
+server
+	.listen({ port: process.env.PORT || 4000 })
+	.then(({ url }) => console.info(`Server up and running on port ${url}`));
