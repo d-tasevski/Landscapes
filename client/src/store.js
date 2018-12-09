@@ -7,6 +7,9 @@ import router from './router';
 
 import {
 	GET_POSTS,
+	GET_USER_POSTS,
+	UPDATE_USER_POST,
+	DELETE_USER_POST,
 	SIGNIN_USER,
 	SIGNUP_USER,
 	GET_CURRENT_USER,
@@ -19,6 +22,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 	state: {
 		posts: [],
+		userPosts: [],
 		loading: false,
 		user: null,
 		error: null,
@@ -28,6 +32,9 @@ export default new Vuex.Store({
 	mutations: {
 		setPosts(state, payload) {
 			state.posts = payload;
+		},
+		setUserPosts(state, payload) {
+			state.userPosts = payload;
 		},
 		setLoading(state, payload) {
 			state.loading = payload;
@@ -80,6 +87,58 @@ export default new Vuex.Store({
 				.catch(err => {
 					commit('setLoading', false);
 					throw new Error(err);
+				});
+		},
+		async getUserPosts({ commit }, payload) {
+			await apolloClient
+				.query({ query: GET_USER_POSTS, variables: payload })
+				.then(({ data }) => {
+					commit('setUserPosts', data.getUserPosts);
+				})
+				.catch(err => {
+					commit('setLoading', false);
+					throw new Error(err);
+				});
+		},
+		updateUserPost({ state, commit }, payload) {
+			apolloClient
+				.mutate({
+					mutation: UPDATE_USER_POST,
+					variables: payload,
+				})
+				.then(({ data }) => {
+					const index = state.userPosts.findIndex(
+						post => post._id === data.updateUserPost._id
+					);
+					const userPosts = [
+						...state.userPosts.slice(0, index),
+						data.updateUserPost,
+						...state.userPosts.slice(index + 1),
+					];
+					commit('setUserPosts', userPosts);
+				})
+				.catch(err => {
+					console.error(err);
+				});
+		},
+		deleteUserPost({ state, commit }, payload) {
+			apolloClient
+				.mutate({
+					mutation: DELETE_USER_POST,
+					variables: payload,
+				})
+				.then(({ data }) => {
+					const index = state.userPosts.findIndex(
+						post => post._id === data.deleteUserPost._id
+					);
+					const userPosts = [
+						...state.userPosts.slice(0, index),
+						...state.userPosts.slice(index + 1),
+					];
+					commit('setUserPosts', userPosts);
+				})
+				.catch(err => {
+					console.error(err);
 				});
 		},
 		addPost({ commit }, payload) {
@@ -185,6 +244,7 @@ export default new Vuex.Store({
 	},
 	getters: {
 		posts: state => state.posts,
+		userPosts: state => state.userPosts,
 		loading: state => state.loading,
 		user: state => state.user,
 		error: state => state.error,

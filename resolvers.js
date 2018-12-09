@@ -29,6 +29,10 @@ module.exports = {
 
 			return posts;
 		},
+		async getUserPosts(root, { userId }, { Post }) {
+			const posts = await Post.find({ createdBy: userId });
+			return posts;
+		},
 		async getPost(root, { postId }, { Post }) {
 			const post = await Post.findById(postId)
 				.populate({
@@ -89,6 +93,30 @@ module.exports = {
 				.catch(err => handleError(err));
 
 			return newPost;
+		},
+		async updateUserPost(
+			root,
+			{ postId, userId, title, imageUrl, categories, description },
+			{ Post }
+		) {
+			const post = await Post.findOneAndUpdate(
+				{ _id: postId, createdBy: userId },
+				{
+					$set: {
+						title,
+						imageUrl,
+						categories,
+						description,
+					},
+				},
+				{ new: true }
+			);
+
+			return post;
+		},
+		async deleteUserPost(root, { postId }, { Post }) {
+			const post = await Post.findOneAndRemove({ _id: postId });
+			return post;
 		},
 		async addPostMessage(root, { messageBody, userId, postId }, { Post }) {
 			const newMsg = {
